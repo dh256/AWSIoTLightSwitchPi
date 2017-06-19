@@ -8,35 +8,38 @@
 **
 ** AWS sample message:
 {
-  "light": "RED", 
+  "name": "RED", 
   "state": 0
 }
 */
 const wpi=require("wiringpi-node");
 const awsIot=require('aws-iot-device-sdk');
 
-// lights
+// light
 
 // pin numbers - use the WPI standards
 const pin_amber = 2;
 const pin_red = 3;
 const pin_green = 0;
+const test_delay = 150;
 
 // red, amber, green lights
-var redLight = new light("RED", pin_red, 1);
-var amberlight = new light("AMBER", pin_amber, 0);
-var greenLight = new light("GREEN", pin_green, 0);
+var redLight = new light("RED", pin_red, 0);            // red light initially off
+var amberlight = new light("AMBER", pin_amber, 0);      // amber light initially off
+var greenLight = new light("GREEN", pin_green, 0);      // gree light initially off
 var lights = [redLight, amberlight, greenLight];
 
-// initialise lights (WPI)
+// initialise lights (WPI) and run a quick test
 setUpLights();
+testLights(); 
 
-// AWS IoT
-const privateKeyPath = '/home/pi/awsKeys/03783ab63f-private.pem.key';
-const certPath = '/home/pi/awsKeys/03783ab63f-certificate.pem.crt';
+// AWS IoT Settings - Modify to use your own values
+const privateKeyPath = '/home/pi/awsKeys/pi-private.pem.key';
+const certPath = '/home/pi/awsKeys/pi-certificate.pem.crt';
 const rootCAPath = '/home/pi/awsKeys/RootCA.crt';
-const clientId = '03783ab63f';        // must be unique for each client
-const awsRegion = 'us-east-1';
+const clientId = '03783ab63f';          // must be a unique value for each client
+const awsRegion = 'us-east-1';          // AWS regiion
+const topicName = 'lightCommands'       // topic to subscribe to
 
 var device = awsIot.device({
    keyPath: privateKeyPath,
@@ -49,14 +52,15 @@ var device = awsIot.device({
 // listen for connection
 device.on('connect', function() {
     console.log('Connected to AWS IoT');
-    device.subscribe('lightCommands');
-    console.log('Subscribed to topic'); 
+    device.subscribe(topicName);
+    console.log('Subscribed to topic ' + topicName + '\nWaiting for commands ...');
 });
 
 device.on('message', function(topic, payload) {
     //console.log('Message Received: ' + payload);
     var message = JSON.parse(payload);
-    changeLight(message.light, message.state);
+    changeLight(message.name, message.state);
+    console.log(message.name + " " + message.state);
 });
 
 device.on('offline', function() {
@@ -100,16 +104,22 @@ function changeLight(name, state) {
 
 // test purposes - useful for testing lights
 function testLights() {
-    changeLight(wpi, lights[0], 1);
-    wpi.delay(1000);
-    changeLight(wpi, lights[1], 1);
-    wpi.delay(1000);
-    changeLight(wpi, lights[2], 1);
-    wpi.delay(1000);
-    changeLight(wpi, lights[2], 0);
-    wpi.delay(1000);
-    changeLight(wpi, lights[1], 0);
-    wpi.delay(1000);
-    changeLight(wpi, lights[0], 0);
-    wpi.delay(1000);
+    changeLight(lights[0].name, 1);
+    wpi.delay(test_delay);
+    changeLight(lights[1].name, 1);
+    wpi.delay(test_delay);
+    changeLight(lights[2].name, 1);
+    wpi.delay(test_delay);
+    changeLight(lights[2].name, 0);
+    wpi.delay(test_delay);
+    changeLight(lights[1].name, 0);
+    wpi.delay(test_delay);
+    changeLight(lights[0].name, 0);
+    wpi.delay(test_delay);
+    for(count = 0; count < 3; count++) {
+        changeLight(lights[2].name, 1);
+        wpi.delay(test_delay);
+        changeLight(lights[2].name, 0);
+        wpi.delay(test_delay);
+    }
 }
