@@ -1,0 +1,15 @@
+{
+  "name": "awslights",
+  "version": "1.0.0",
+  "description": "Control lights from AWS IoT",
+  "main": "awslights.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Hanley",
+  "license": "ISC",
+  "dependencies": {
+    "wiringpi-node": "^2.4.4",
+    "aws-iot-device-sdk": "^1.0.14"
+  }
+}
