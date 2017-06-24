@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "wiringpi-node": "^2.4.4",
-    "aws-iot-device-sdk": "^1.0.14"
+    "aws-iot-device-sdk": "^2.0.0"
   }
 }

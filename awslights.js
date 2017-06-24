@@ -4,7 +4,7 @@
 **
 ** Packages:
 **   npm install wiringpi-node
-**   npm intsall aws-iot-device-sdk
+**   npm intsall aws-iot-device-sdk  (2.0.0)
 **
 ** AWS sample message:
 {
@@ -39,14 +39,16 @@ const certPath = '/home/pi/awsKeys/pi-certificate.pem.crt';
 const rootCAPath = '/home/pi/awsKeys/RootCA.crt';
 const clientId = '03783ab63f';          // must be a unique value for each client
 const awsRegion = 'us-east-1';          // AWS regiion
-const topicName = 'lightCommands'       // topic to subscribe to
+const topicName = 'lightCommands';       // topic to subscribe to
+const endpoint = 'a1hfn7ridqkxza.iot.us-east-1.amazonaws.com';   // endpoint - required for 2.0.0+
 
 var device = awsIot.device({
    keyPath: privateKeyPath,
   certPath: certPath,
     caPath: rootCAPath,
   clientId: clientId,
-    region: awsRegion 
+    region: awsRegion, 
+    host: endpoint
 });
 
 // listen for connection
