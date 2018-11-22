@@ -14,6 +14,7 @@
 */
 const wpi=require("wiringpi-node");
 const awsIot=require('aws-iot-device-sdk');
+const os=require('os');
 
 // light
 
@@ -34,13 +35,13 @@ setUpLights();
 testLights(); 
 
 // AWS IoT Settings - Modify to use your own values
-const privateKeyPath = '/home/pi/awsKeys/pi-private.pem.key';
-const certPath = '/home/pi/awsKeys/pi-certificate.pem.crt';
+const clientId = 'ae8639f4df';          // must be a unique value for each client
+const privateKeyPath = `/home/pi/awsKeys/${clientId}-private.pem.key`;
+const certPath = `/home/pi/awsKeys/${clientId}-certificate.pem.crt`;
 const rootCAPath = '/home/pi/awsKeys/RootCA.crt';
-const clientId = '03783ab63f';          // must be a unique value for each client
-const awsRegion = 'us-east-1';          // AWS regiion
+const awsRegion = 'us-east-1';          // AWS region
 const topicName = 'lightCommands';       // topic to subscribe to
-const endpoint = 'a1hfn7ridqkxza.iot.us-east-1.amazonaws.com';   // endpoint - required for 2.0.0+
+const endpoint = 'a1a5vmkre2h9ju-ats.iot.us-east-1.amazonaws.com';   // endpoint - required for 2.0.0+
 
 var device = awsIot.device({
    keyPath: privateKeyPath,
@@ -55,14 +56,13 @@ var device = awsIot.device({
 device.on('connect', function() {
     console.log('Connected to AWS IoT');
     device.subscribe(topicName);
-    console.log('Subscribed to topic ' + topicName + '\nWaiting for commands ...');
+    console.log(`Subscribed to topic ${topicName}${os.EOL}Waiting for commands ...`);
 });
 
 device.on('message', function(topic, payload) {
-    //console.log('Message Received: ' + payload);
     var message = JSON.parse(payload);
     changeLight(message.name, message.state);
-    console.log(message.name + " " + message.state);
+    console.log(`${message.name} ${message.state}`);
 });
 
 device.on('offline', function() {
@@ -74,7 +74,7 @@ device.on('reconnect', function() {
 });
 
 device.on('error', function(error) {
-    console.error('Error: ' + error.toString());
+    console.error(`Error: ${error.toString()}`);
 });
 
 function light(name, pin, state) {
@@ -106,6 +106,7 @@ function changeLight(name, state) {
 
 // test purposes - useful for testing lights
 function testLights() {
+    console.log(`Testing lights ...`);
     changeLight(lights[0].name, 1);
     wpi.delay(test_delay);
     changeLight(lights[1].name, 1);

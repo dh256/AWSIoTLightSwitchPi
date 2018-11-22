@@ -9,7 +9,9 @@
   "author": "David Hanley",
   "license": "ISC",
   "dependencies": {
-    "wiringpi-node": "^2.4.4",
-    "aws-iot-device-sdk": "^2.0.0"
+    "aws-iot-device-sdk": "^2.2.1",
+    "os": "^0.1.1",
+    "uid": "0.0.2",
+    "wiringpi-node": "^2.4.4"
   }
 }
